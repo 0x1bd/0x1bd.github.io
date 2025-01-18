@@ -1,25 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>kvxd</title>
     <style>
         /* General styles */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             text-align: center;
             padding: 50px;
             margin: 0;
             overflow: hidden;
             color: #fff;
+            background: linear-gradient(135deg, #1a1a1a, #000);
+            cursor: none !important; /* Hide default cursor globally */
+        }
+
+        /* Hide cursor on all elements */
+        * {
+            cursor: none !important;
         }
 
         h1 {
             font-size: 3em;
             margin-bottom: 0.5em;
+            font-weight: bold;
+            color: #fff;
         }
 
         p {
             font-size: 1.2em;
+            color: #ccc;
         }
 
         /* Projects section */
@@ -32,7 +44,7 @@
             width: 250px;
             margin: 20px;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, background 0.3s ease;
@@ -41,31 +53,19 @@
         }
 
         .project:hover {
-            transform: scale(1.1);
-            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .project h3 {
             font-size: 1.5em;
             margin-bottom: 0.5em;
+            color: #fff;
         }
 
         .project p {
             font-size: 1em;
-        }
-
-        /* Dynamic background */
-        #background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            background-size: 200% 200%;
-            filter: blur(20px);
+            color: #ccc;
         }
 
         /* Film grain effect */
@@ -77,15 +77,49 @@
             height: 100%;
             z-index: -2;
             pointer-events: none;
-            background: url('https://www.transparenttextures.com/patterns/noise.png'); /* Free noise pattern */
-            opacity: 0.2;
+            background: url('https://www.transparenttextures.com/patterns/noise.png');
+            opacity: 0.1;
             mix-blend-mode: overlay;
+        }
+
+        /* Pixel fighting canvas */
+        #pixel-fighting {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -3;
+            pointer-events: none;
+            filter: blur(10px); /* Reduced blur for a smoother effect */
+        }
+
+        /* Custom cursor */
+        #custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s ease, height 0.2s ease;
+            z-index: 9999;
+        }
+
+        /* Cursor shrink effect when clicked */
+        body:active #custom-cursor {
+            width: 10px;
+            height: 10px;
         }
     </style>
 </head>
 <body>
-<div id="background"></div>
 <div id="grain"></div>
+<canvas id="pixel-fighting"></canvas>
+<div id="custom-cursor"></div>
 
 <h1>kvxd</h1>
 <p>Welcome to my website.</p>
@@ -98,23 +132,8 @@
     </div>
 </section>
 
-<!-- Mouse Interaction Script -->
+<!-- GitHub Projects Script -->
 <script>
-    const background = document.getElementById("background");
-
-    document.addEventListener("mousemove", (event) => {
-        const { clientX, clientY } = event;
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
-        // Calculate the position as a percentage
-        const xPercent = (clientX / width) * 100;
-        const yPercent = (clientY / height) * 100;
-
-        // Update the background position dynamically
-        background.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
-    });
-
     async function fetchGitHubProjects() {
         const username = "0x1bd";
         const response = await fetch(`https://api.github.com/users/${username}/repos`);
@@ -135,6 +154,161 @@
     }
 
     fetchGitHubProjects();
+</script>
+
+<!-- Pixel Fighting Script -->
+<script>
+    var canvas, ctx;
+    var interval;
+    var width, height;
+    var size, step;
+    var Sum_1;
+    var color1 = Math.floor(Math.random() * 16777215).toString(16);
+    color1 = "#" + ("000000" + color1).slice(-6);
+    var color2 = Math.floor(Math.random() * 16777215).toString(16);
+    color2 = "#" + ("000000" + color2).slice(-6);
+
+    function setup() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas = document.getElementById("pixel-fighting");
+        ctx = canvas.getContext("2d");
+        canvas.width = width;
+        canvas.height = height;
+        size = 100; // Reduced size for smoother animation
+        step = Math.max(width, height) / size;
+        Sum_1 = 0;
+
+        initialize();
+        interval = setInterval(run, 50); // Slower animation
+    }
+
+    function initialize() {
+        Old = new Array(size);
+        New = new Array(size);
+        Neigh = new Array(size);
+        Ratio1 = new Array(size);
+
+        for (i = 0; i < Old.length; ++i) {
+            Old[i] = new Array(size);
+            New[i] = new Array(size);
+            Neigh[i] = new Array(size);
+            Ratio1[i] = new Array(size);
+        }
+        for (i = 0; i < size; ++i) {
+            for (j = 0; j < size; ++j) {
+                Ratio1[i][j] = 0;
+                Neigh[i][j] = 8;
+                if (i === 0 || i === size - 1) {
+                    Neigh[i][j] = 5;
+                    if (j === 0 || j === size - 1) {
+                        Neigh[i][j] = 3;
+                    }
+                }
+                if (j === 0 || j === size - 1) {
+                    Neigh[i][j] = 5;
+                    if (i === 0 || i === size - 1) {
+                        Neigh[i][j] = 3;
+                    }
+                }
+
+                if (i < size / 2) {
+                    Old[i][j] = 1;
+                    Sum_1 += 1;
+                } else {
+                    Old[i][j] = 0;
+                }
+                New[i][j] = Old[i][j];
+            }
+        }
+        Sum_1 = Sum_1 / (size * size);
+    }
+
+    function ratio() {
+        for (i = 0; i < size; ++i) {
+            for (j = 0; j < size; ++j) {
+                Ratio1[i][j] = 0;
+                if (i > 0) {
+                    if (j > 0) { Ratio1[i][j] += Old[i - 1][j - 1]; }
+                    Ratio1[i][j] += Old[i - 1][j];
+                    if (j < size - 1) { Ratio1[i][j] += Old[i - 1][j + 1]; }
+                }
+
+                if (j > 0) { Ratio1[i][j] += Old[i][j - 1]; }
+                if (j < size - 1) { Ratio1[i][j] += Old[i][j + 1]; }
+
+                if (i < size - 1) {
+                    if (j > 0) { Ratio1[i][j] += Old[i + 1][j - 1]; }
+                    Ratio1[i][j] += Old[i + 1][j];
+                    if (j < size - 1) { Ratio1[i][j] += Old[i + 1][j + 1]; }
+                }
+
+                Ratio1[i][j] = Ratio1[i][j] / Neigh[i][j];
+            }
+        }
+    }
+
+    function draw() {
+        for (i = 0; i < size; ++i) {
+            for (j = 0; j < size; ++j) {
+                ctx.fillStyle = color1;
+                if (Old[i][j] === 1) { ctx.fillStyle = color2; }
+                ctx.fillRect(i * step, j * step, step, step);
+            }
+        }
+    }
+
+    function calculate() {
+        for (i = 0; i < size; ++i) {
+            for (j = 0; j < size; ++j) {
+                help = Math.random();
+
+                if ((Ratio1[i][j]) > help) {
+                    Old[i][j] = 1;
+                } else {
+                    Old[i][j] = 0;
+                }
+            }
+        }
+
+        Sum_1 = 0;
+        for (i = 0; i < size; ++i) {
+            for (j = 0; j < size; ++j) {
+                if (Old[i][j] == 1) Sum_1 += 1;
+            }
+        }
+        Sum_1 = Sum_1 / (size * size);
+    }
+
+    function run() {
+        ratio();
+        draw();
+        calculate();
+    }
+
+    window.onload = setup;
+</script>
+
+<!-- Custom Cursor Script -->
+<script>
+    const customCursor = document.getElementById('custom-cursor');
+
+    // Update cursor position
+    document.addEventListener('mousemove', (e) => {
+        customCursor.style.left = `${e.clientX}px`;
+        customCursor.style.top = `${e.clientY}px`;
+    });
+
+    // Ensure cursor remains hidden during drag operations
+    document.addEventListener('mousedown', () => {
+        customCursor.style.width = '10px';
+        customCursor.style.height = '10px';
+    });
+
+    document.addEventListener('mouseup', () => {
+        customCursor.style.width = '20px';
+        customCursor.style.height = '20px';
+    });
 </script>
 </body>
 </html>
