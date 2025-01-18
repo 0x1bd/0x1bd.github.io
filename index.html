@@ -11,7 +11,6 @@
             text-align: center;
             padding: 50px;
             margin: 0;
-            overflow: hidden;
             color: #fff;
             background: linear-gradient(135deg, #1a1a1a, #000);
             cursor: none !important; /* Hide default cursor globally */
@@ -20,6 +19,21 @@
         /* Hide cursor on all elements */
         * {
             cursor: none !important;
+        }
+
+        /* Text container with subtle semi-transparent background */
+        .content {
+            position: relative;
+            z-index: 2; /* Ensure text is above the background */
+            background: rgba(0, 0, 0, 0.4); /* Subtle semi-transparent black overlay */
+            padding: 30px;
+            border-radius: 20px; /* Softer edges */
+            display: inline-block;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+            backdrop-filter: blur(5px); /* Slight blur for a frosted glass effect */
+            max-width: 1200px; /* Wider max-width for more projects */
+            width: 90%; /* Responsive width */
         }
 
         h1 {
@@ -31,7 +45,8 @@
 
         p {
             font-size: 1.2em;
-            color: #ccc;
+            color: #eee; /* Slightly brighter text color */
+            font-weight: 400; /* Normal font weight */
         }
 
         /* Projects section */
@@ -39,13 +54,17 @@
             margin-top: 50px;
         }
 
+        #project-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 20px; /* Space between projects */
+            justify-content: center;
+        }
+
         .project {
-            display: inline-block;
-            width: 250px;
-            margin: 20px;
-            padding: 20px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
+            padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, background 0.3s ease;
             text-decoration: none;
@@ -68,27 +87,13 @@
             color: #ccc;
         }
 
-        /* Film grain effect */
-        #grain {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            pointer-events: none;
-            background: url('https://www.transparenttextures.com/patterns/noise.png');
-            opacity: 0.1;
-            mix-blend-mode: overlay;
-        }
-
         /* Pixel fighting canvas */
         #pixel-fighting {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             z-index: -3;
             pointer-events: none;
             filter: blur(10px); /* Reduced blur for a smoother effect */
@@ -117,20 +122,23 @@
     </style>
 </head>
 <body>
-<div id="grain"></div>
 <canvas id="pixel-fighting"></canvas>
 <div id="custom-cursor"></div>
 
-<h1>kvxd</h1>
-<p>Welcome to my website.</p>
+<!-- Content with subtle semi-transparent background -->
+<div class="content">
+    <h1>kvxd</h1>
+    <p>Welcome to my website</p>
+    <p>I make stuff on the internet.</p>
 
-<!-- Projects Section -->
-<section id="projects">
-    <h2>My Public Projects</h2>
-    <div id="project-list">
-        <!-- Projects will be dynamically added here -->
-    </div>
-</section>
+    <!-- Projects Section -->
+    <section id="projects">
+        <h2>My Public Projects</h2>
+        <div id="project-list">
+            <!-- Projects will be dynamically added here -->
+        </div>
+    </section>
+</div>
 
 <!-- GitHub Projects Script -->
 <script>
