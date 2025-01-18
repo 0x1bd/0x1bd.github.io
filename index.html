@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>kvxd</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 0.5em;
+        }
+
+        p {
+            font-size: 1.2em;
+        }
+
+        /* Projects section */
+        #projects {
+            margin-top: 50px;
+        }
+
+        .project {
+            display: inline-block;
+            width: 250px;
+            margin: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, background 0.3s ease;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .project:hover {
+            transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .project h3 {
+            font-size: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        .project p {
+            font-size: 1em;
+        }
+
+        /* Dynamic background */
+        #background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background-size: 200% 200%;
+            filter: blur(20px);
+        }
+
+        /* Film grain effect */
+        #grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+            background: url('https://www.transparenttextures.com/patterns/noise.png'); /* Free noise pattern */
+            opacity: 0.2;
+            mix-blend-mode: overlay;
+        }
+    </style>
+</head>
+<body>
+<div id="background"></div>
+<div id="grain"></div>
+
+<h1>kvxd</h1>
+<p>Welcome to my website.</p>
+
+<!-- Projects Section -->
+<section id="projects">
+    <h2>My Public Projects</h2>
+    <div id="project-list">
+        <!-- Projects will be dynamically added here -->
+    </div>
+</section>
+
+<!-- Mouse Interaction Script -->
+<script>
+    const background = document.getElementById("background");
+
+    document.addEventListener("mousemove", (event) => {
+        const { clientX, clientY } = event;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Calculate the position as a percentage
+        const xPercent = (clientX / width) * 100;
+        const yPercent = (clientY / height) * 100;
+
+        // Update the background position dynamically
+        background.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
+    });
+
+    async function fetchGitHubProjects() {
+        const username = "0x1bd";
+        const response = await fetch(`https://api.github.com/users/${username}/repos`);
+        const repos = await response.json();
+
+        const projectList = document.getElementById("project-list");
+        repos.forEach(repo => {
+            const project = document.createElement("a");
+            project.classList.add("project");
+            project.href = repo.html_url;
+            project.target = "_blank";
+            project.innerHTML = `
+                    <h3>${repo.name}</h3>
+                    <p>${repo.description || "No description provided."}</p>
+                `;
+            projectList.appendChild(project);
+        });
+    }
+
+    fetchGitHubProjects();
+</script>
+</body>
+</html>
